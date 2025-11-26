@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
+import axios from "axios";
 
+import authRoute from "./routes/auth.js";
 import artistsRoute from "./routes/artists.js";
 import artworkRoute from "./routes/artwork.js";
 import captionsRoute from "./routes/captions.js";
@@ -49,6 +51,7 @@ app.use((req, res, next) => {
 // ───────────────────────────────────────
 // Routes
 // ───────────────────────────────────────
+app.use("/auth", authRoute);
 app.use("/artists", artistsRoute);
 app.use("/artwork", artworkRoute);
 app.use("/captions", captionsRoute);
