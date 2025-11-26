@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import axios from "axios";
 
+// Routes
 import authRoute from "./routes/auth.js";
 import artistsRoute from "./routes/artists.js";
 import artworkRoute from "./routes/artwork.js";
@@ -12,7 +13,7 @@ import publishRoute from "./routes/publish.js";
 const app = express();
 
 // ───────────────────────────────────────
-// CORS (required for login + Vercel → Railway requests)
+// CORS CONFIG (Vercel → Railway)
 // ───────────────────────────────────────
 
 const allowedOrigins = process.env.ALLOWED_ORIGIN
@@ -41,7 +42,7 @@ app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200mb" }));
 
 // ───────────────────────────────────────
-// Logging
+// Request Logging
 // ───────────────────────────────────────
 app.use((req, res, next) => {
   console.log(`[Gateway] ${req.method} ${req.url}`);
@@ -49,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 // ───────────────────────────────────────
-// Routes
+// API ROUTES
 // ───────────────────────────────────────
 app.use("/auth", authRoute);
 app.use("/artists", artistsRoute);
@@ -59,14 +60,14 @@ app.use("/slice", sliceRoute);
 app.use("/publish", publishRoute);
 
 // ───────────────────────────────────────
-// Health Check
+// HEALTH CHECK (Railway uses this)
 // ───────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({ status: "Gateway OK" });
 });
 
 // ───────────────────────────────────────
-// Start Server
+// START SERVER
 // ───────────────────────────────────────
 const PORT = process.env.PORT || 8080;
 
