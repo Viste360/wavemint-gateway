@@ -4,7 +4,6 @@ import axios from "axios";
 const router = express.Router();
 
 const BACKEND_URL = process.env.BACKEND_URL;
-// example: https://wavemint-backend-production.up.railway.app
 
 router.post("/login", async (req, res) => {
   try {
@@ -19,7 +18,7 @@ router.post("/login", async (req, res) => {
     console.log("❌ Gateway Login Error:", err.response?.data || err.message);
     res.status(400).json({
       error: "Login failed",
-      detail: err.response?.data,
+      detail: err.response?.data || err.message,
     });
   }
 });
