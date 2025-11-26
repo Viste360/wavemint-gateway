@@ -1,81 +1,46 @@
-console.log("🚀 REAL ENV ALLOWED_ORIGIN =", process.env.ALLOWED_ORIGIN);
 import express from "express";
 import cors from "cors";
-
 import authRoute from "./routes/auth.js";
-import artistsRoute from "./routes/artists.js";
 import artworkRoute from "./routes/artwork.js";
 import captionsRoute from "./routes/captions.js";
-import sliceRoute from "./routes/slice.js";
 import publishRoute from "./routes/publish.js";
+import sliceRoute from "./routes/slice.js";
 
 const app = express();
 
-// ───────────────────────────────────────
-// CORS — FINAL WORKING VERSION
-// ───────────────────────────────────────
+// =========================
+//  FIXED CORS CONFIG
+// =========================
+const allowedOrigins = (process.env.ALLOWED_ORIGIN || "").split(",");
 
-const allowedOrigins = process.env.ALLOWED_ORIGIN
-  ? process.env.ALLOWED_ORIGIN.split(",")
-  : [];
-
-console.log("Allowed origins:", allowedOrigins);
+console.log("🚀 Allowed origins:", allowedOrigins);
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow server-to-server + mobile apps
-
-      console.log("Incoming Origin:", origin);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.log("❌ BLOCKED BY CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
-// Allow preflight (OPTIONS)
 app.options("*", cors());
 
-// ───────────────────────────────────────
-// Body Parsing
-// ───────────────────────────────────────
+// Parse JSON
+app.use(express.json({ limit: "50mb" }));
 
-app.use(express.json({ limit: "200mb" }));
-app.use(express.urlencoded({ extended: true, limit: "200mb" }));
-
-// Log every request
-app.use((req, res, next) => {
-  console.log(`[Gateway] ${req.method} ${req.url}`);
-  next();
-});
-
-// ───────────────────────────────────────
-// ROUTES
-// ───────────────────────────────────────
-
+// Routes
 app.use("/auth", authRoute);
-app.use("/artists", artistsRoute);
 app.use("/artwork", artworkRoute);
 app.use("/captions", captionsRoute);
-app.use("/slice", sliceRoute);
 app.use("/publish", publishRoute);
+app.use("/slice", sliceRoute);
 
 // Health check
 app.get("/", (req, res) => {
   res.json({ status: "Gateway OK" });
 });
 
-// Start server
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`🌐 Wavemint Gateway running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🌐 Gateway running on port ${PORT}`));
 
