@@ -1,28 +1,27 @@
 import express from "express";
-import jwt from "jsonwebtoken";
+import axios from "axios";
 
 const router = express.Router();
 
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
+const BACKEND_URL = process.env.BACKEND_URL;
+// example: https://wavemint-backend-production.up.railway.app
 
-  if (
-    email === process.env.ADMIN_EMAIL &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    const token = jwt.sign(
-      { email, role: "admin" },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+router.post("/login", async (req, res) => {
+  try {
+    const response = await axios.post(
+      `${BACKEND_URL}/auth/login`,
+      req.body,
+      { headers: { "Content-Type": "application/json" } }
     );
 
-    return res.json({
-      token,
-      user: { email, role: "admin" },
+    res.json(response.data);
+  } catch (err) {
+    console.log("❌ Gateway Login Error:", err.response?.data || err.message);
+    res.status(400).json({
+      error: "Login failed",
+      detail: err.response?.data,
     });
   }
-
-  return res.status(401).json({ error: "Invalid credentials" });
 });
 
 export default router;
