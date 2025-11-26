@@ -11,29 +11,41 @@ import publishRoute from "./routes/publish.js";
 const app = express();
 
 // ───────────────────────────────────────
-// CORS
+// CORS — FINAL WORKING VERSION
 // ───────────────────────────────────────
 
 const allowedOrigins = process.env.ALLOWED_ORIGIN
   ? process.env.ALLOWED_ORIGIN.split(",")
-  : ["*"];
+  : [];
+
+console.log("Allowed origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true); // allow server-to-server + mobile apps
+
+      console.log("Incoming Origin:", origin);
+
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
-      } else {
-        console.log("❌ CORS BLOCKED:", origin);
-        return callback(new Error("Not allowed by CORS"));
       }
+
+      console.log("❌ BLOCKED BY CORS:", origin);
+      return callback(new Error("Not allowed by CORS"));
     },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
+
+// Allow preflight (OPTIONS)
+app.options("*", cors());
+
+// ───────────────────────────────────────
+// Body Parsing
+// ───────────────────────────────────────
 
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200mb" }));
@@ -45,10 +57,10 @@ app.use((req, res, next) => {
 });
 
 // ───────────────────────────────────────
-// ROUTES (FINAL VERSION)
+// ROUTES
 // ───────────────────────────────────────
 
-app.use("/auth", authRoute);        // ✅ THIS FIXES LOGIN
+app.use("/auth", authRoute);
 app.use("/artists", artistsRoute);
 app.use("/artwork", artworkRoute);
 app.use("/captions", captionsRoute);
