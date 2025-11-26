@@ -1,14 +1,26 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 export const forward = async (url, options = {}) => {
-  const res = await fetch(url, options);
-  const contentType = res.headers.get("content-type");
+  const method = options.method || "GET";
+  const headers = options.headers || {};
+  const body = options.body;
 
-  // If it's JSON → return JSON
+  const axiosOptions = {
+    method,
+    url,
+    headers,
+    responseType: "arraybuffer", // can handle JSON or binary
+    data: body,
+    validateStatus: () => true, // allow backend to return errors
+  };
+
+  const res = await axios(axiosOptions);
+
+  const contentType = res.headers["content-type"];
+
   if (contentType && contentType.includes("application/json")) {
-    return await res.json();
+    return JSON.parse(res.data.toString());
   }
 
-  // Otherwise return raw buffer (for media files)
-  return await res.arrayBuffer();
+  return res.data;
 };
