@@ -1,3 +1,4 @@
+console.log("🚀 REAL ENV ALLOWED_ORIGIN =", process.env.ALLOWED_ORIGIN);
 import express from "express";
 import cors from "cors";
 
