@@ -3,24 +3,20 @@ import axios from "axios";
 
 const router = express.Router();
 
-const BACKEND_URL = process.env.BACKEND_URL;
+const BACKEND_URL = process.env.BACKEND_URL; 
+// example: "https://wavemint-backend-production.up.railway.app"
 
+// Login → forward to backend
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    const response = await axios.post(`${BACKEND_URL}/auth/login`, {
-      email,
-      password,
+    const response = await axios.post(`${BACKEND_URL}/auth/login`, req.body, {
+      headers: { "Content-Type": "application/json" },
     });
 
-    return res.json(response.data);
+    res.json(response.data);
   } catch (err) {
-    console.error("❌ Login error:", err?.response?.data || err.message);
-
-    return res
-      .status(err?.response?.status || 500)
-      .json(err?.response?.data || { error: "Login failed" });
+    console.log("❌ Gateway Login Error:", err.response?.data || err.message);
+    res.status(400).json({ error: "Login failed", detail: err.response?.data });
   }
 });
 
