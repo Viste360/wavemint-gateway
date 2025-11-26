@@ -1,8 +1,6 @@
 import express from "express";
 import cors from "cors";
-import axios from "axios";
 
-// Routes
 import authRoute from "./routes/auth.js";
 import artistsRoute from "./routes/artists.js";
 import artworkRoute from "./routes/artwork.js";
@@ -13,7 +11,7 @@ import publishRoute from "./routes/publish.js";
 const app = express();
 
 // ───────────────────────────────────────
-// CORS CONFIG (Vercel → Railway)
+// CORS
 // ───────────────────────────────────────
 
 const allowedOrigins = process.env.ALLOWED_ORIGIN
@@ -23,7 +21,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGIN
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow server-to-server
+      if (!origin) return callback(null, true);
       if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
@@ -37,40 +35,33 @@ app.use(
   })
 );
 
-// Body parsing
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200mb" }));
 
-// ───────────────────────────────────────
-// Request Logging
-// ───────────────────────────────────────
+// Log every request
 app.use((req, res, next) => {
   console.log(`[Gateway] ${req.method} ${req.url}`);
   next();
 });
 
 // ───────────────────────────────────────
-// API ROUTES
+// ROUTES (FINAL VERSION)
 // ───────────────────────────────────────
-app.use("/auth", authRoute);
+
+app.use("/auth", authRoute);        // ✅ THIS FIXES LOGIN
 app.use("/artists", artistsRoute);
 app.use("/artwork", artworkRoute);
 app.use("/captions", captionsRoute);
 app.use("/slice", sliceRoute);
 app.use("/publish", publishRoute);
 
-// ───────────────────────────────────────
-// HEALTH CHECK (Railway uses this)
-// ───────────────────────────────────────
+// Health check
 app.get("/", (req, res) => {
   res.json({ status: "Gateway OK" });
 });
 
-// ───────────────────────────────────────
-// START SERVER
-// ───────────────────────────────────────
+// Start server
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, () => {
   console.log(`🌐 Wavemint Gateway running on port ${PORT}`);
 });
