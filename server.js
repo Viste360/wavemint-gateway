@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-
 import authRoute from "./routes/auth.js";
 import artworkRoute from "./routes/artwork.js";
 import captionsRoute from "./routes/captions.js";
@@ -22,6 +21,7 @@ app.use(
   })
 );
 
+// Preflight
 app.options("*", cors());
 
 // Body parser
