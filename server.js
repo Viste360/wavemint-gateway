@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+
 import authRoute from "./routes/auth.js";
 import artworkRoute from "./routes/artwork.js";
 import captionsRoute from "./routes/captions.js";
@@ -9,12 +10,12 @@ import sliceRoute from "./routes/slice.js";
 const app = express();
 
 // CORS
-const allowedOrigins = (process.env.ALLOWED_ORIGIN || "").split(",");
-console.log("🚀 Allowed origins:", allowedOrigins);
+const allowedOrigin = process.env.ALLOWED_ORIGIN?.trim();
+console.log("🚀 Allowed origin:", allowedOrigin);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: allowedOrigin,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
