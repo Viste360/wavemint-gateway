@@ -8,25 +8,22 @@ import sliceRoute from "./routes/slice.js";
 
 const app = express();
 
-// =========================
-//  FIXED CORS CONFIG
-// =========================
+// CORS
 const allowedOrigins = (process.env.ALLOWED_ORIGIN || "").split(",");
-
 console.log("🚀 Allowed origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.options("*", cors());
 
-// Parse JSON
+// Body parser
 app.use(express.json({ limit: "50mb" }));
 
 // Routes
@@ -41,6 +38,6 @@ app.get("/", (req, res) => {
   res.json({ status: "Gateway OK" });
 });
 
+// Start server
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`🌐 Gateway running on port ${PORT}`));
-
+app.listen(PORT, () => console.log(`🌐 Gateway running on ${PORT}`));
